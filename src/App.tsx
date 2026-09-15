@@ -120,6 +120,9 @@ const SuperMallAppContent: React.FC = () => {
       if (path === '/faqs') return { type: 'faqs' };
       if (path === '/shipping-returns') return { type: 'shipping_returns' };
       if (path === '/report-issue') return { type: 'report_issue' };
+      if (path === '/admin/content' || params.get('content') === 'true') {
+          return { type: 'content_admin', section: 'about' };
+      }
     }
     return { type: 'home' };
   });
@@ -203,6 +206,8 @@ const SuperMallAppContent: React.FC = () => {
           setCurrentView({ type: 'report_issue' });
         } else {
           setCurrentView({ type: 'home' });
+        } else if (path === '/admin/content' || params.get('content') === 'true') {
+          setCurrentView({ type: 'content_admin', section: 'about' });
         }
       }
     };
