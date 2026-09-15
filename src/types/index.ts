@@ -210,3 +210,8 @@ export type ActiveView =
   | { type: 'minisite'; slug: string; subTab?: string }
   | { type: 'business_dashboard'; businessId?: string; subTab?: string }
   | { type: 'admin'; subTab?: 'dashboard' | 'businesses' | 'categories' | 'bookings' | 'users' | 'reports' };
+  | { type: 'about' }
+  | { type: 'help' }
+  | { type: 'faqs' }
+  | { type: 'shipping_returns' }
+  | { type: 'report_issue' }
