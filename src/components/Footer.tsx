@@ -128,9 +128,12 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentView, onSelectCategory
             </h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <button
+                  onClick={() => setCurrentView({ type: 'about' })}
+                  className="hover:text-amber-400 transition-colors text-left"
+                >
                   About Us
-                </a>
+                </button>
               </li>
               <li>
                 <a href="#" className="hover:text-amber-400 transition-colors">
@@ -165,29 +168,44 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentView, onSelectCategory
             </h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <button
+                  onClick={() => setCurrentView({ type: 'help' })}
+                  className="hover:text-amber-400 transition-colors text-left"
+                >
                   Help Center
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <a
+                  href="mailto:support@supermall.mw"
+                  className="hover:text-amber-400 transition-colors"
+                >
                   Contact Us
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <button
+                  onClick={() => setCurrentView({ type: 'faqs' })}
+                  className="hover:text-amber-400 transition-colors text-left"
+                >
                   FAQs
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <button
+                  onClick={() => setCurrentView({ type: 'shipping_returns' })}
+                  className="hover:text-amber-400 transition-colors text-left"
+                >
                   Shipping & Returns
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <button
+                  onClick={() => setCurrentView({ type: 'report_issue' })}
+                  className="hover:text-amber-400 transition-colors text-left"
+                >
                   Report an Issue
-                </a>
+                </button>
               </li>
             </ul>
           </div>
