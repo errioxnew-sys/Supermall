@@ -9,7 +9,6 @@ import {
   X,
   Compass,
   Sparkles,
-  PlusCircle,
   LayoutGrid,
 } from 'lucide-react';
 import { useAuth, SUPERUSER_CONFIG } from '../context/AuthContext.tsx';
@@ -144,16 +143,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <span>{link.label}</span>
               </button>
             ))}
-
-            {/* List Your Business CTA */}
-            <button
-              id="nav-list-business"
-              onClick={() => setCurrentView({ type: 'register_business' })}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white transition-all shadow-sm"
-            >
-              <PlusCircle className="w-3.5 h-3.5" />
-              <span>List Your Business</span>
-            </button>
           </nav>
 
           {/* User Account Controls */}
@@ -245,14 +234,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <span>{link.label}</span>
               </button>
             ))}
-
-            <button
-              onClick={() => handleNavClick({ type: 'register_business' })}
-              className="text-left px-3 py-2 text-sm font-medium rounded-lg flex items-center gap-2 bg-amber-600 text-white hover:bg-amber-700"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span>List Your Business</span>
-            </button>
           </div>
 
           <div className="pt-3 border-t border-stone-200">
