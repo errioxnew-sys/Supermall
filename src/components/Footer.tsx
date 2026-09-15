@@ -129,6 +129,7 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentView, onSelectCategory
             <ul className="space-y-2">
               <li>
                 <button
+                  id="footer-about-btn"
                   onClick={() => setCurrentView({ type: 'about' })}
                   className="hover:text-amber-400 transition-colors text-left"
                 >
@@ -136,22 +137,35 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentView, onSelectCategory
                 </button>
               </li>
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <button
+                  id="footer-careers-btn"
+                  onClick={() => setCurrentView({ type: 'about' })}
+                  className="hover:text-amber-400 transition-colors text-left"
+                >
                   Careers
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
-                  Press & Media
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
-                  Blog
-                </a>
+                </button>
               </li>
               <li>
                 <button
+                  id="footer-press-btn"
+                  onClick={() => setCurrentView({ type: 'about' })}
+                  className="hover:text-amber-400 transition-colors text-left"
+                >
+                  Press & Media
+                </button>
+              </li>
+              <li>
+                <button
+                  id="footer-blog-btn"
+                  onClick={() => setCurrentView({ type: 'help' })}
+                  className="hover:text-amber-400 transition-colors text-left"
+                >
+                  Blog & Guides
+                </button>
+              </li>
+              <li>
+                <button
+                  id="footer-sell-btn"
                   onClick={() => setCurrentView({ type: 'register_business' })}
                   className="hover:text-amber-400 transition-colors text-left"
                 >
@@ -169,6 +183,7 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentView, onSelectCategory
             <ul className="space-y-2">
               <li>
                 <button
+                  id="footer-help-btn"
                   onClick={() => setCurrentView({ type: 'help' })}
                   className="hover:text-amber-400 transition-colors text-left"
                 >
@@ -176,15 +191,17 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentView, onSelectCategory
                 </button>
               </li>
               <li>
-                <a
-                  href="mailto:support@supermall.mw"
-                  className="hover:text-amber-400 transition-colors"
+                <button
+                  id="footer-contact-btn"
+                  onClick={() => setCurrentView({ type: 'about' })}
+                  className="hover:text-amber-400 transition-colors text-left"
                 >
                   Contact Us
-                </a>
+                </button>
               </li>
               <li>
                 <button
+                  id="footer-faqs-btn"
                   onClick={() => setCurrentView({ type: 'faqs' })}
                   className="hover:text-amber-400 transition-colors text-left"
                 >
@@ -193,6 +210,7 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentView, onSelectCategory
               </li>
               <li>
                 <button
+                  id="footer-shipping-btn"
                   onClick={() => setCurrentView({ type: 'shipping_returns' })}
                   className="hover:text-amber-400 transition-colors text-left"
                 >
@@ -201,6 +219,7 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentView, onSelectCategory
               </li>
               <li>
                 <button
+                  id="footer-report-issue-btn"
                   onClick={() => setCurrentView({ type: 'report_issue' })}
                   className="hover:text-amber-400 transition-colors text-left"
                 >

@@ -67,6 +67,32 @@ service cloud.firestore {
       allow delete: if true;
     }
 
+    // Static Content (About, Shipping & Returns)
+    match /content/{contentId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // FAQs
+    match /faqs/{faqId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Help Articles
+    match /help_articles/{articleId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Issue Reports
+    match /issue_reports/{reportId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if isAdmin();
+    }
+
     // Mall Settings / Announcements
     match /settings/{settingId} {
       allow read: if true;

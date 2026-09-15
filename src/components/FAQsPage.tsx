@@ -28,6 +28,7 @@ export const FAQsPage: React.FC<Props> = ({ faqs, setCurrentView }) => {
       <section className="bg-gradient-to-br from-amber-50 via-stone-50 to-white border-b border-stone-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <button
+            id="faqs-back-home-btn"
             onClick={() => setCurrentView({ type: 'home' })}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-stone-500 hover:text-amber-700 mb-6"
           >

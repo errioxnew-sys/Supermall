@@ -157,6 +157,18 @@
     "/orders/{orderId}": {
       "schema": { "$ref": "#/entities/Order" },
       "description": "Customer product orders and purchases"
+    },
+    "/content/{contentId}": {
+      "description": "Static informational content documents like about, shipping & returns"
+    },
+    "/faqs/{faqId}": {
+      "description": "Frequently asked questions"
+    },
+    "/help_articles/{articleId}": {
+      "description": "Help center guides and documentation"
+    },
+    "/issue_reports/{reportId}": {
+      "description": "User submitted support and issue reports"
     }
   }
 }

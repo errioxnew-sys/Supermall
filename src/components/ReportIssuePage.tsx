@@ -73,6 +73,7 @@ export const ReportIssuePage: React.FC<Props> = ({ setCurrentView, onSubmit }) =
             can also email us directly at <span className="font-semibold">support@supermall.mw</span>.
           </p>
           <button
+            id="report-issue-home-btn"
             onClick={() => setCurrentView({ type: 'home' })}
             className="px-6 py-2.5 bg-stone-900 text-white text-sm font-semibold rounded-lg hover:bg-stone-800"
           >
@@ -88,6 +89,7 @@ export const ReportIssuePage: React.FC<Props> = ({ setCurrentView, onSubmit }) =
       <section className="bg-gradient-to-br from-amber-50 via-stone-50 to-white border-b border-stone-200">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-14 text-center">
           <button
+            id="report-issue-back-btn"
             onClick={() => setCurrentView({ type: 'home' })}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-stone-500 hover:text-amber-700 mb-6"
           >
@@ -111,6 +113,7 @@ export const ReportIssuePage: React.FC<Props> = ({ setCurrentView, onSubmit }) =
               What's the issue about?
             </label>
             <select
+              id="report-issue-type-select"
               value={type}
               onChange={(e) => setType(e.target.value as IssueReport['type'])}
               className="w-full px-4 py-2.5 text-sm bg-white border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600/30"
@@ -129,6 +132,7 @@ export const ReportIssuePage: React.FC<Props> = ({ setCurrentView, onSubmit }) =
               Your email
             </label>
             <input
+              id="report-issue-email-input"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -146,6 +150,7 @@ export const ReportIssuePage: React.FC<Props> = ({ setCurrentView, onSubmit }) =
               Subject
             </label>
             <input
+              id="report-issue-subject-input"
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
@@ -160,6 +165,7 @@ export const ReportIssuePage: React.FC<Props> = ({ setCurrentView, onSubmit }) =
               Order or booking ID <span className="text-stone-400 font-normal">(optional)</span>
             </label>
             <input
+              id="report-issue-related-input"
               type="text"
               value={relatedId}
               onChange={(e) => setRelatedId(e.target.value)}
@@ -174,6 +180,7 @@ export const ReportIssuePage: React.FC<Props> = ({ setCurrentView, onSubmit }) =
               Description
             </label>
             <textarea
+              id="report-issue-desc-input"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={6}
@@ -189,6 +196,7 @@ export const ReportIssuePage: React.FC<Props> = ({ setCurrentView, onSubmit }) =
           )}
 
           <button
+            id="report-issue-submit-btn"
             type="submit"
             disabled={submitting}
             className="w-full py-3 bg-stone-900 text-white text-sm font-semibold rounded-lg hover:bg-stone-800 disabled:opacity-60 transition-colors"

@@ -31,6 +31,7 @@ export const ShippingReturnsPage: React.FC<Props> = ({ content, setCurrentView }
       <section className="bg-gradient-to-br from-amber-50 via-stone-50 to-white border-b border-stone-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <button
+            id="shipping-back-home-btn"
             onClick={() => setCurrentView({ type: 'home' })}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-stone-500 hover:text-amber-700 mb-6"
           >
@@ -64,6 +65,7 @@ export const ShippingReturnsPage: React.FC<Props> = ({ content, setCurrentView }
         <div className="text-center pt-4">
           <p className="text-xs text-stone-400 mb-6">Last updated: {content.lastUpdated}</p>
           <button
+            id="shipping-report-issue-btn"
             onClick={() => setCurrentView({ type: 'report_issue' })}
             className="px-6 py-2.5 bg-stone-900 text-white text-sm font-semibold rounded-lg hover:bg-stone-800"
           >
