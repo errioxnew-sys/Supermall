@@ -11,6 +11,10 @@ import {
   BookingStatus,
   Order,
   OrderStatus,
+  AboutContent,
+  FaqItem,
+  HelpArticle,
+  ShippingReturnsPolicy,
 } from './types/index.ts';
 import {
   subscribeBusinesses,
@@ -30,12 +34,25 @@ import {
   seedInitialSuperMallData,
 } from './firebase/services.ts';
 import {
+  subscribeAbout,
+  subscribeFaqs,
+  subscribeHelpArticles,
+  subscribeShippingReturns,
+  submitIssueReport,
+} from './firebase/contentServices.ts';
+import {
   INITIAL_BUSINESSES,
   INITIAL_CATEGORIES,
   INITIAL_BOOKINGS,
   INITIAL_REVIEWS,
   INITIAL_ORDERS,
 } from './data/seedData.ts';
+import {
+  SEED_ABOUT,
+  SEED_FAQS,
+  SEED_HELP_ARTICLES,
+  SEED_SHIPPING_RETURNS,
+} from './data/contentSeedData.ts';
 
 import { Header } from './components/Header.tsx';
 import { Hero } from './components/Hero.tsx';
@@ -49,6 +66,11 @@ import { BookingModal } from './components/BookingModal.tsx';
 import { RegisterBusinessModal } from './components/RegisterBusinessModal.tsx';
 import { PythonAnywhereModal } from './components/PythonAnywhereModal.tsx';
 import { Footer } from './components/Footer.tsx';
+import { AboutPage } from './components/AboutPage.tsx';
+import { HelpCenterPage } from './components/HelpCenterPage.tsx';
+import { FAQsPage } from './components/FAQsPage.tsx';
+import { ShippingReturnsPage } from './components/ShippingReturnsPage.tsx';
+import { ReportIssuePage } from './components/ReportIssuePage.tsx';
 
 const SuperMallAppContent: React.FC = () => {
   const { currentBusinessId, setCurrentBusinessId, setCurrentRole } = useAuth();
@@ -59,6 +81,13 @@ const SuperMallAppContent: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>(INITIAL_BOOKINGS);
   const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
+
+  // Content state (About / Help / FAQs / Shipping)
+  const [aboutContent, setAboutContent] = useState<AboutContent>(SEED_ABOUT);
+  const [faqs, setFaqs] = useState<FaqItem[]>(SEED_FAQS);
+  const [helpArticles, setHelpArticles] = useState<HelpArticle[]>(SEED_HELP_ARTICLES);
+  const [shippingReturns, setShippingReturns] =
+    useState<ShippingReturnsPolicy>(SEED_SHIPPING_RETURNS);
 
   // Active Navigation View
   const [currentView, setCurrentView] = useState<ActiveView>(() => {
@@ -84,6 +113,12 @@ const SuperMallAppContent: React.FC = () => {
       if (params.get('view') === 'explore' || path === '/explore') {
         return { type: 'explore' };
       }
+      // Static content pages
+      if (path === '/about') return { type: 'about' };
+      if (path === '/help') return { type: 'help' };
+      if (path === '/faqs') return { type: 'faqs' };
+      if (path === '/shipping-returns') return { type: 'shipping_returns' };
+      if (path === '/report-issue') return { type: 'report_issue' };
     }
     return { type: 'home' };
   });
@@ -108,6 +143,12 @@ const SuperMallAppContent: React.FC = () => {
     const unsubReviews = subscribeReviews(setReviews);
     const unsubOrders = subscribeOrders(setOrders);
 
+    // Content subscriptions
+    const unsubAbout = subscribeAbout(setAboutContent);
+    const unsubFaqs = subscribeFaqs(setFaqs);
+    const unsubHelp = subscribeHelpArticles(setHelpArticles);
+    const unsubShipping = subscribeShippingReturns(setShippingReturns);
+
     // Trigger non-blocking seed in case DB is fresh
     seedInitialSuperMallData().catch((e) => console.warn('Seed notice:', e));
 
@@ -117,6 +158,10 @@ const SuperMallAppContent: React.FC = () => {
       unsubBookings();
       unsubReviews();
       unsubOrders();
+      unsubAbout();
+      unsubFaqs();
+      unsubHelp();
+      unsubShipping();
     };
   }, []);
 
@@ -134,12 +179,27 @@ const SuperMallAppContent: React.FC = () => {
           setCurrentView({ type: 'business_site', slug: sParam });
         } else if (params.get('admin') === 'true' || path === '/admin') {
           setCurrentView({ type: 'admin', subTab: 'dashboard' });
-        } else if (params.get('dashboard') || params.get('business_admin') || path.startsWith('/dashboard')) {
+        } else if (
+          params.get('dashboard') ||
+          params.get('business_admin') ||
+          path.startsWith('/dashboard')
+        ) {
           const dashParam = params.get('dashboard') || params.get('business_admin');
-          const bizId = typeof dashParam === 'string' && dashParam !== 'true' ? dashParam : undefined;
+          const bizId =
+            typeof dashParam === 'string' && dashParam !== 'true' ? dashParam : undefined;
           setCurrentView({ type: 'business_dashboard', businessId: bizId });
         } else if (params.get('view') === 'explore' || path === '/explore') {
           setCurrentView({ type: 'explore' });
+        } else if (path === '/about') {
+          setCurrentView({ type: 'about' });
+        } else if (path === '/help') {
+          setCurrentView({ type: 'help' });
+        } else if (path === '/faqs') {
+          setCurrentView({ type: 'faqs' });
+        } else if (path === '/shipping-returns') {
+          setCurrentView({ type: 'shipping_returns' });
+        } else if (path === '/report-issue') {
+          setCurrentView({ type: 'report_issue' });
         } else {
           setCurrentView({ type: 'home' });
         }
@@ -166,12 +226,25 @@ const SuperMallAppContent: React.FC = () => {
     } else if (view.type === 'business_dashboard') {
       const q = view.businessId ? `/?dashboard=${view.businessId}` : '/?dashboard=true';
       window.history.pushState({}, '', q);
+    } else if (view.type === 'about') {
+      window.history.pushState({}, '', '/about');
+    } else if (view.type === 'help') {
+      window.history.pushState({}, '', '/help');
+    } else if (view.type === 'faqs') {
+      window.history.pushState({}, '', '/faqs');
+    } else if (view.type === 'shipping_returns') {
+      window.history.pushState({}, '', '/shipping-returns');
+    } else if (view.type === 'report_issue') {
+      window.history.pushState({}, '', '/report-issue');
     }
   }, []);
 
-  const handleVisitShop = useCallback((slug: string) => {
-    navigateTo({ type: 'business_site', slug });
-  }, [navigateTo]);
+  const handleVisitShop = useCallback(
+    (slug: string) => {
+      navigateTo({ type: 'business_site', slug });
+    },
+    [navigateTo]
+  );
 
   const handleOpenBooking = useCallback((business: Business, service?: ServiceItem) => {
     setActiveBookingBusiness(business);
@@ -179,16 +252,22 @@ const SuperMallAppContent: React.FC = () => {
     setIsBookingModalOpen(true);
   }, []);
 
-  const handleSearchFromHero = useCallback((query: string, city?: City) => {
-    setSearchQuery(query);
-    setSelectedCity(city);
-    navigateTo({ type: 'explore', initialSearch: query, initialCity: city });
-  }, [navigateTo]);
+  const handleSearchFromHero = useCallback(
+    (query: string, city?: City) => {
+      setSearchQuery(query);
+      setSelectedCity(city);
+      navigateTo({ type: 'explore', initialSearch: query, initialCity: city });
+    },
+    [navigateTo]
+  );
 
-  const handleSelectCategoryFromHero = useCallback((categorySlug: string) => {
-    setSelectedCategorySlug(categorySlug);
-    navigateTo({ type: 'explore', categorySlug });
-  }, [navigateTo]);
+  const handleSelectCategoryFromHero = useCallback(
+    (categorySlug: string) => {
+      setSelectedCategorySlug(categorySlug);
+      navigateTo({ type: 'explore', categorySlug });
+    },
+    [navigateTo]
+  );
 
   // Business CRUD
   const handleUpdateBusiness = async (businessId: string, updates: Partial<Business>) => {
@@ -236,7 +315,15 @@ const SuperMallAppContent: React.FC = () => {
   };
 
   // Review CRUD
-  const handleAddReview = async (businessId: string, reviewInput: { customerName: string; rating: number; comment: string; serviceUsed?: string }) => {
+  const handleAddReview = async (
+    businessId: string,
+    reviewInput: {
+      customerName: string;
+      rating: number;
+      comment: string;
+      serviceUsed?: string;
+    }
+  ) => {
     const newReview: Omit<Review, 'id'> = {
       businessId,
       customerName: reviewInput.customerName,
@@ -255,7 +342,8 @@ const SuperMallAppContent: React.FC = () => {
     const currentBiz = businesses.find((b) => b.id === businessId);
     if (currentBiz) {
       const allBizReviews = [...reviews.filter((r) => r.businessId === businessId), fullReview];
-      const avgRating = allBizReviews.reduce((sum, r) => sum + r.rating, 0) / allBizReviews.length;
+      const avgRating =
+        allBizReviews.reduce((sum, r) => sum + r.rating, 0) / allBizReviews.length;
       handleUpdateBusiness(businessId, {
         rating: Number(avgRating.toFixed(1)),
         reviewCount: allBizReviews.length,
@@ -371,7 +459,10 @@ const SuperMallAppContent: React.FC = () => {
             onOpenDashboard={() => {
               setCurrentBusinessId(activeMiniSiteBusiness!.id);
               setCurrentRole('business_owner');
-              navigateTo({ type: 'business_dashboard', businessId: activeMiniSiteBusiness!.id });
+              navigateTo({
+                type: 'business_dashboard',
+                businessId: activeMiniSiteBusiness!.id,
+              });
             }}
           />
         )}
@@ -413,6 +504,31 @@ const SuperMallAppContent: React.FC = () => {
             onViewMiniSite={handleVisitShop}
             onSeedData={seedInitialSuperMallData}
           />
+        )}
+
+        {/* VIEW 6: ABOUT */}
+        {currentView.type === 'about' && (
+          <AboutPage content={aboutContent} setCurrentView={navigateTo} />
+        )}
+
+        {/* VIEW 7: HELP CENTER */}
+        {currentView.type === 'help' && (
+          <HelpCenterPage articles={helpArticles} setCurrentView={navigateTo} />
+        )}
+
+        {/* VIEW 8: FAQS */}
+        {currentView.type === 'faqs' && (
+          <FAQsPage faqs={faqs} setCurrentView={navigateTo} />
+        )}
+
+        {/* VIEW 9: SHIPPING & RETURNS */}
+        {currentView.type === 'shipping_returns' && (
+          <ShippingReturnsPage content={shippingReturns} setCurrentView={navigateTo} />
+        )}
+
+        {/* VIEW 10: REPORT ISSUE */}
+        {currentView.type === 'report_issue' && (
+          <ReportIssuePage setCurrentView={navigateTo} onSubmit={submitIssueReport} />
         )}
       </main>
 
