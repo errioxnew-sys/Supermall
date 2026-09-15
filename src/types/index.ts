@@ -203,15 +203,27 @@ export interface SuperMallUser {
   createdAt?: string;
 }
 
-export type ActiveView = 
+export type ActiveView =
   | { type: 'home' }
-  | { type: 'explore'; categorySlug?: string; initialCategorySlug?: string; initialCity?: City; city?: City; initialSearch?: string; search?: string }
+  | {
+      type: 'explore';
+      categorySlug?: string;
+      initialCategorySlug?: string;
+      initialCity?: City;
+      city?: City;
+      initialSearch?: string;
+      search?: string;
+    }
   | { type: 'business_site'; slug: string; subTab?: string }
   | { type: 'minisite'; slug: string; subTab?: string }
   | { type: 'business_dashboard'; businessId?: string; subTab?: string }
-  | { type: 'admin'; subTab?: 'dashboard' | 'businesses' | 'categories' | 'bookings' | 'users' | 'reports' };
+  | {
+      type: 'admin';
+      subTab?: 'dashboard' | 'businesses' | 'categories' | 'bookings' | 'users' | 'reports';
+    }
   | { type: 'about' }
   | { type: 'help' }
   | { type: 'faqs' }
   | { type: 'shipping_returns' }
   | { type: 'report_issue' }
+  | { type: 'register_business' };
