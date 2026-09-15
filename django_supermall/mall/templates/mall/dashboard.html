@@ -1,0 +1,154 @@
+{% extends 'mall/base.html' %}
+{% load static %}
+
+{% block title %}{{ business.name }} - Staff Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-stone-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    
+    <!-- Merchant Header Bar -->
+    <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <img src="{{ business.get_logo_url }}" alt="{{ business.name }}" class="w-14 h-14 rounded-xl object-cover border border-stone-200">
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-serif font-bold text-2xl text-stone-900">{{ business.name }}</h1>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 uppercase">{{ business.tier }}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold {% if business.commerce_mode == 'both' %}bg-amber-100 text-amber-900 border border-amber-300{% elif business.commerce_mode == 'booking' %}bg-blue-100 text-blue-900 border border-blue-300{% else %}bg-emerald-100 text-emerald-900 border border-emerald-300{% endif %}">
+              {% if business.commerce_mode == 'both' %}Booking & Cart{% elif business.commerce_mode == 'booking' %}Booking Only{% else %}Cart Only{% endif %}
+            </span>
+          </div>
+          <p class="text-xs text-stone-500 mt-0.5">Merchant Staff & Operations Portal • {{ business.city }}, Malawi</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Store Capability Switcher -->
+        <div class="flex items-center gap-1.5 bg-stone-50 border border-stone-200 rounded-xl px-3 py-1.5 text-xs">
+          <span class="text-stone-500 text-[11px] font-medium">Store Mode:</span>
+          <select id="dashCommerceMode" onchange="updateBusinessMode(this.value)" class="bg-transparent font-bold text-stone-800 focus:outline-none cursor-pointer">
+            <option value="both" {% if business.commerce_mode == 'both' %}selected{% endif %}>Both Booking & Cart</option>
+            <option value="cart" {% if business.commerce_mode == 'cart' %}selected{% endif %}>Cart Only (Retail)</option>
+            <option value="booking" {% if business.commerce_mode == 'booking' %}selected{% endif %}>Booking Only (Services)</option>
+          </select>
+        </div>
+
+        <a href="{% url 'mall:mini_site' slug=business.slug %}" target="_blank" class="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+          <span>Live Storefront</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex items-center gap-3 border-b border-stone-200 pb-2 text-xs font-semibold">
+      <a href="{% url 'mall:merchant_dashboard' slug=business.slug %}" class="px-4 py-2 rounded-xl bg-stone-900 text-white shadow-xs">
+        Overview
+      </a>
+      <a href="{% url 'mall:merchant_inventory' slug=business.slug %}" class="px-4 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:bg-stone-50">
+        Inventory & Catalogue
+      </a>
+      <a href="{% url 'mall:merchant_orders' slug=business.slug %}" class="px-4 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:bg-stone-50">
+        Customer Orders
+      </a>
+    </div>
+
+    <!-- Metric Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
+        <span class="text-xs text-stone-500 font-medium">Gross Bag Sales</span>
+        <div class="font-serif font-bold text-2xl text-amber-900 mt-1">MWK {{ total_sales }}</div>
+        <span class="text-[10px] text-stone-400">Excluding cancellations</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
+        <span class="text-xs text-stone-500 font-medium">Customer Orders</span>
+        <div class="font-serif font-bold text-2xl text-stone-900 mt-1">{{ orders.count }}</div>
+        <span class="text-[10px] text-stone-400">Shopping bag checkouts</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
+        <span class="text-xs text-stone-500 font-medium">Active Catalogue</span>
+        <div class="font-serif font-bold text-2xl text-stone-900 mt-1">{{ products_count }} items</div>
+        <span class="text-[10px] text-stone-400">Merchandise in store</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
+        <span class="text-xs text-stone-500 font-medium">Store Rating</span>
+        <div class="font-serif font-bold text-2xl text-emerald-700 mt-1">★ {{ business.rating }}</div>
+        <span class="text-[10px] text-stone-400">From {{ business.review_count }} verified buyers</span>
+      </div>
+    </div>
+
+    <!-- Recent Orders Table -->
+    <div class="bg-white rounded-2xl border border-stone-200 shadow-xs overflow-hidden">
+      <div class="p-5 border-b border-stone-100 flex items-center justify-between">
+        <h3 class="font-serif font-bold text-base text-stone-900">Recent Customer Orders</h3>
+        <a href="{% url 'mall:merchant_orders' slug=business.slug %}" class="text-xs font-bold text-amber-700 hover:text-amber-800">
+          Manage All Orders &rarr;
+        </a>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-stone-50 text-stone-500 font-semibold border-b border-stone-200">
+            <tr>
+              <th class="p-3.5">Order Ref</th>
+              <th class="p-3.5">Buyer</th>
+              <th class="p-3.5">Phone</th>
+              <th class="p-3.5">Total (MWK)</th>
+              <th class="p-3.5">Delivery</th>
+              <th class="p-3.5">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            {% for ord in orders %}
+              <tr class="hover:bg-stone-50 transition-colors">
+                <td class="p-3.5 font-mono font-bold text-stone-900">#{{ ord.order_ref }}</td>
+                <td class="p-3.5 font-medium">{{ ord.customer_name }}</td>
+                <td class="p-3.5 text-stone-500">{{ ord.customer_phone }}</td>
+                <td class="p-3.5 font-bold text-amber-900">MWK {{ ord.total }}</td>
+                <td class="p-3.5 capitalize">{{ ord.delivery_option }}</td>
+                <td class="p-3.5">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase {% if ord.status == 'pending' %}bg-amber-100 text-amber-800{% elif ord.status == 'confirmed' %}bg-blue-100 text-blue-800{% elif ord.status == 'dispatched' %}bg-purple-100 text-purple-800{% elif ord.status == 'completed' %}bg-emerald-100 text-emerald-800{% else %}bg-rose-100 text-rose-800{% endif %}">
+                    {{ ord.status }}
+                  </span>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="p-8 text-center text-stone-500 text-xs">No orders recorded yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  async function updateBusinessMode(mode) {
+    try {
+      const resp = await fetch('/api/business/mode/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ business_id: '{{ business.id }}', commerce_mode: mode })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        alert('Store capability updated to: ' + mode);
+        window.location.reload();
+      } else {
+        alert('Failed to update mode: ' + (data.error || 'Server error'));
+      }
+    } catch (e) {
+      alert('Network error: ' + e.message);
+    }
+  }
+</script>
+{% endblock %}

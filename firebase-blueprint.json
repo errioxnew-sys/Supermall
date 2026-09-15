@@ -1,0 +1,162 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile in SuperMall platform (customers, business owners, and admins)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "business_owner", "customer"] },
+        "businessId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "email", "role"]
+    },
+    "Business": {
+      "title": "Business",
+      "description": "Independent business mini-website entity hosted on SuperMall",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "category": { "type": "string" },
+        "categorySlug": { "type": "string" },
+        "tagline": { "type": "string" },
+        "description": { "type": "string" },
+        "location": { "type": "string" },
+        "city": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "website": { "type": "string" },
+        "logo": { "type": "string" },
+        "coverImage": { "type": "string" },
+        "rating": { "type": "number" },
+        "reviewCount": { "type": "number" },
+        "verified": { "type": "boolean" },
+        "featured": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["active", "pending_verification", "suspended"] },
+        "openingHours": { "type": "array" },
+        "services": { "type": "array" },
+        "gallery": { "type": "array" },
+        "about": { "type": "string" },
+        "amenities": { "type": "array" },
+        "tier": { "type": "string", "enum": ["free", "business", "premium"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "ownerId", "name", "slug", "category", "city", "status"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "SuperMall directory browsing categories",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "icon": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "businessCount": { "type": "number" }
+      },
+      "required": ["id", "name", "slug"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Service appointment booking made by customer for a business",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "businessName": { "type": "string" },
+        "businessSlug": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "serviceName": { "type": "string" },
+        "servicePrice": { "type": "number" },
+        "currency": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "customerMessage": { "type": "string" },
+        "bookingDate": { "type": "string" },
+        "bookingTime": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "rejected", "completed"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "businessId", "serviceName", "customerName", "customerPhone", "bookingDate", "bookingTime", "status"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Customer rating and review for a business",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "date": { "type": "string" },
+        "serviceUsed": { "type": "string" },
+        "verified": { "type": "boolean" }
+      },
+      "required": ["id", "businessId", "customerName", "rating", "comment"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer product orders and checkout records",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "orderRef": { "type": "string" },
+        "businessId": { "type": "string" },
+        "businessName": { "type": "string" },
+        "businessSlug": { "type": "string" },
+        "items": { "type": "array" },
+        "totalAmount": { "type": "number" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "deliveryAddress": { "type": "string" },
+        "deliveryCity": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "dispatched", "completed", "cancelled"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "orderRef", "businessId", "totalAmount", "customerName", "customerPhone", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/businesses/{businessId}": {
+      "schema": { "$ref": "#/entities/Business" },
+      "description": "Independent business listings and mini-site profiles"
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "SuperMall categories"
+    },
+    "/bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/Booking" },
+      "description": "Customer bookings and appointments"
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/Review" },
+      "description": "Customer reviews and ratings"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer product orders and purchases"
+    }
+  }
+}

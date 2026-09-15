@@ -1,0 +1,249 @@
+{% extends 'mall/base.html' %}
+{% load static %}
+
+{% block title %}Inventory & Products - {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-stone-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    
+    <!-- Merchant Header Bar -->
+    <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <img src="{{ business.get_logo_url }}" alt="{{ business.name }}" class="w-14 h-14 rounded-xl object-cover border border-stone-200">
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-serif font-bold text-2xl text-stone-900">{{ business.name }}</h1>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold {% if business.commerce_mode == 'both' %}bg-amber-100 text-amber-900 border border-amber-300{% elif business.commerce_mode == 'booking' %}bg-blue-100 text-blue-900 border border-blue-300{% else %}bg-emerald-100 text-emerald-900 border border-emerald-300{% endif %}">
+              {% if business.commerce_mode == 'both' %}Booking & Cart{% elif business.commerce_mode == 'booking' %}Booking Only{% else %}Cart Only{% endif %}
+            </span>
+          </div>
+          <p class="text-xs text-stone-500 mt-0.5">Product Catalogue & Stock Control</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="document.getElementById('addGalleryModal').classList.remove('hidden')" class="px-3.5 py-2.5 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-2 cursor-pointer">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          <span>Post Gallery Photo</span>
+        </button>
+
+        <button onclick="document.getElementById('addProductModal').classList.remove('hidden')" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-2 cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Add New Product</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex items-center gap-3 border-b border-stone-200 pb-2 text-xs font-semibold">
+      <a href="{% url 'mall:merchant_dashboard' slug=business.slug %}" class="px-4 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:bg-stone-50">
+        Overview
+      </a>
+      <a href="{% url 'mall:merchant_inventory' slug=business.slug %}" class="px-4 py-2 rounded-xl bg-stone-900 text-white shadow-xs">
+        Inventory & Catalogue ({{ products.count }})
+      </a>
+      <a href="{% url 'mall:merchant_orders' slug=business.slug %}" class="px-4 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:bg-stone-50">
+        Customer Orders
+      </a>
+    </div>
+
+    <!-- Products Table -->
+    <div class="bg-white rounded-2xl border border-stone-200 shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-stone-50 text-stone-500 font-semibold border-b border-stone-200">
+            <tr>
+              <th class="p-3.5">Product</th>
+              <th class="p-3.5">Category</th>
+              <th class="p-3.5">Price (MWK)</th>
+              <th class="p-3.5">Stock Qty</th>
+              <th class="p-3.5">Sizes</th>
+              <th class="p-3.5">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            {% for prod in products %}
+              <tr class="hover:bg-stone-50 transition-colors">
+                <td class="p-3.5 flex items-center gap-3">
+                  <img src="{{ prod.get_image_url }}" class="w-10 h-10 rounded-lg object-cover border border-stone-200" alt="{{ prod.name }}">
+                  <div>
+                    <span class="font-bold text-stone-900 block">{{ prod.name }}</span>
+                    <span class="text-[10px] text-stone-400 font-mono">{{ prod.sku|default:"NO-SKU" }}</span>
+                  </div>
+                </td>
+                <td class="p-3.5 text-stone-600">{{ prod.category }}</td>
+                <td class="p-3.5 font-bold font-serif text-amber-900">MWK {{ prod.price }}</td>
+                <td class="p-3.5 font-mono font-bold">{{ prod.stock }} units</td>
+                <td class="p-3.5 text-stone-500">{{ prod.sizes|default:"Standard" }}</td>
+                <td class="p-3.5">
+                  {% if prod.in_stock and prod.stock > 0 %}
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">In Stock</span>
+                  {% else %}
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">Sold Out</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="p-12 text-center text-stone-500 text-xs">
+                  No products added yet. Click "Add New Product" to populate your storefront.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Add Product Modal (Internal Device File Upload) -->
+<div id="addProductModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-stone-900/60 backdrop-blur-xs p-4">
+  <div class="bg-white rounded-2xl max-w-lg w-full p-6 text-left space-y-4 shadow-2xl border border-stone-200">
+    <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+      <div>
+        <h3 class="font-serif font-bold text-lg text-stone-900">Add Merchandise to Storefront</h3>
+        <p class="text-[11px] text-stone-500">Upload photos directly from your device storage</p>
+      </div>
+      <button onclick="document.getElementById('addProductModal').classList.add('hidden')" class="text-stone-400 hover:text-stone-800 p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'mall:merchant_inventory' slug=business.slug %}" class="space-y-3 text-xs">
+      {% csrf_token %}
+      <div>
+        <label class="block text-stone-700 font-medium mb-1">Product Title *</label>
+        <input type="text" name="name" placeholder="e.g. Hand-tailored Chitenge Shirt" required class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none">
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-stone-700 font-medium mb-1">Price (MWK) *</label>
+          <input type="number" name="price" placeholder="35000" required class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-stone-700 font-medium mb-1">Initial Stock Count *</label>
+          <input type="number" name="stock" value="10" required class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-stone-700 font-medium mb-1">Category / Tag</label>
+          <input type="text" name="category" placeholder="Apparel, Dresses, Accessories" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-stone-700 font-medium mb-1">Available Sizes</label>
+          <input type="text" name="sizes" placeholder="S, M, L, XL" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none">
+        </div>
+      </div>
+
+      <!-- Photo from internal device storage -->
+      <div class="border-2 border-dashed border-amber-300/80 rounded-xl p-3.5 bg-amber-50/50 text-center">
+        <label class="block text-stone-900 font-bold mb-1">Product Photo (Internal Device Storage) *</label>
+        <p class="text-[10px] text-stone-500 mb-2">Select an image file directly from your computer or phone files</p>
+        <input type="file" name="image_file" accept="image/*" required class="w-full text-xs text-stone-700 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-700 cursor-pointer">
+      </div>
+
+      <div>
+        <label class="block text-stone-700 font-medium mb-1">Description</label>
+        <textarea name="description" rows="2" placeholder="Fabric details, wash instructions, fitting style..." class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none"></textarea>
+      </div>
+
+      <div class="pt-3 border-t border-stone-100 flex items-center justify-end gap-3">
+        <button type="button" onclick="document.getElementById('addProductModal').classList.add('hidden')" class="px-4 py-2 border border-stone-200 rounded-xl text-stone-600 font-semibold">
+          Cancel
+        </button>
+        <button type="submit" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold shadow-xs">
+          Publish Product
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Gallery Photo Modal (Internal Device File Upload) -->
+<div id="addGalleryModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-stone-900/60 backdrop-blur-xs p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 text-left space-y-4 shadow-2xl border border-stone-200">
+    <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+      <div>
+        <h3 class="font-serif font-bold text-lg text-stone-900">Post Photo to Store Gallery</h3>
+        <p class="text-[11px] text-stone-500">Share store moments or showcase shots</p>
+      </div>
+      <button onclick="document.getElementById('addGalleryModal').classList.add('hidden')" class="text-stone-400 hover:text-stone-800 p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+
+    <form id="galleryUploadForm" onsubmit="uploadGalleryPhoto(event)" class="space-y-3 text-xs">
+      <div>
+        <label class="block text-stone-700 font-medium mb-1">Photo Title</label>
+        <input type="text" id="gTitle" placeholder="e.g. Storefront Window Display" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none">
+      </div>
+
+      <div class="border-2 border-dashed border-stone-300 rounded-xl p-3.5 bg-stone-50 text-center">
+        <label class="block text-stone-900 font-bold mb-1">Choose Photo File (Internal Storage) *</label>
+        <p class="text-[10px] text-stone-500 mb-2">Browse internal storage for JPG or PNG images</p>
+        <input type="file" id="gFile" accept="image/*" required class="w-full text-xs text-stone-700 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-stone-900 file:text-white hover:file:bg-stone-800 cursor-pointer">
+      </div>
+
+      <div>
+        <label class="block text-stone-700 font-medium mb-1">Caption / Description</label>
+        <textarea id="gCaption" rows="2" placeholder="Brief note about this photo..." class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none"></textarea>
+      </div>
+
+      <div class="pt-3 border-t border-stone-100 flex items-center justify-end gap-3">
+        <button type="button" onclick="document.getElementById('addGalleryModal').classList.add('hidden')" class="px-4 py-2 border border-stone-200 rounded-xl text-stone-600 font-semibold">
+          Cancel
+        </button>
+        <button type="submit" id="gSubmitBtn" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold shadow-xs">
+          Upload Photo
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  async function uploadGalleryPhoto(e) {
+    e.preventDefault();
+    const fileInput = document.getElementById('gFile');
+    if (!fileInput.files || !fileInput.files[0]) {
+      alert('Please select a photo from your internal storage.');
+      return;
+    }
+    const btn = document.getElementById('gSubmitBtn');
+    btn.disabled = true;
+    btn.innerText = 'Uploading...';
+
+    const formData = new FormData();
+    formData.append('business_id', '{{ business.id }}');
+    formData.append('title', document.getElementById('gTitle').value.trim());
+    formData.append('caption', document.getElementById('gCaption').value.trim());
+    formData.append('image_file', fileInput.files[0]);
+
+    try {
+      const resp = await fetch('/api/gallery/upload/', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await resp.json();
+      if (data.success) {
+        alert('Photo uploaded to gallery successfully from internal storage!');
+        document.getElementById('addGalleryModal').classList.add('hidden');
+        window.location.reload();
+      } else {
+        alert('Upload failed: ' + (data.error || 'Server error'));
+      }
+    } catch (err) {
+      alert('Network error: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerText = 'Upload Photo';
+    }
+  }
+</script>
+{% endblock %}

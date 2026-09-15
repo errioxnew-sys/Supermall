@@ -1,0 +1,8 @@
+{
+  "name": "SuperMall",
+  "description": "Digital shopping mall platform featuring independent business mini-websites, categorized directory, interactive booking system, isolated business dashboards, and platform admin management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

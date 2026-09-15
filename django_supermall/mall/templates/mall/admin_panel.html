@@ -1,0 +1,296 @@
+{% extends 'mall/base.html' %}
+{% load static %}
+
+{% block title %}SuperMall Platform Admin Console{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-stone-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    
+    <!-- Admin Top Bar -->
+    <div class="bg-stone-900 text-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-serif font-bold text-2xl">SuperMall Admin Console</h1>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-stone-900 uppercase">Master Control</span>
+          </div>
+          <p class="text-xs text-stone-400 mt-0.5">Central Management for Malawian Stores, Bag Orders & Merchant Onboarding</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="seedDatabase()" class="px-3.5 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span>Seed Malawi Data</span>
+        </button>
+
+        <button onclick="document.getElementById('addMerchantModal').classList.remove('hidden')" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-stone-900 font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Add New Merchant</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Platform Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+      <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
+        <span class="text-stone-500 font-medium block">Active Merchants</span>
+        <span class="font-serif font-bold text-2xl text-stone-900 mt-1 block">{{ businesses.count }}</span>
+        <span class="text-[10px] text-stone-400">Stores across 4 cities</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
+        <span class="text-stone-500 font-medium block">Total Bag Orders</span>
+        <span class="font-serif font-bold text-2xl text-amber-900 mt-1 block">{{ orders.count }}</span>
+        <span class="text-[10px] text-stone-400">Customer checkouts</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
+        <span class="text-stone-500 font-medium block">Appointments Booked</span>
+        <span class="font-serif font-bold text-2xl text-stone-900 mt-1 block">{{ bookings.count }}</span>
+        <span class="text-[10px] text-stone-400">Service reservations</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
+        <span class="text-stone-500 font-medium block">Active Categories</span>
+        <span class="font-serif font-bold text-2xl text-stone-900 mt-1 block">{{ categories.count }}</span>
+        <span class="text-[10px] text-stone-400">Shopping departments</span>
+      </div>
+    </div>
+
+    <!-- Merchants Table -->
+    <div class="bg-white rounded-2xl border border-stone-200 shadow-xs overflow-hidden">
+      <div class="p-5 border-b border-stone-100 flex items-center justify-between">
+        <h3 class="font-serif font-bold text-base text-stone-900">Registered Stores & Boutiques</h3>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-stone-50 text-stone-500 font-semibold border-b border-stone-200">
+            <tr>
+              <th class="p-3.5">Store Brand</th>
+              <th class="p-3.5">Category</th>
+              <th class="p-3.5">City</th>
+              <th class="p-3.5">Capability</th>
+              <th class="p-3.5">Tier</th>
+              <th class="p-3.5">Rating</th>
+              <th class="p-3.5">Status</th>
+              <th class="p-3.5 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            {% for b in businesses %}
+              <tr class="hover:bg-stone-50 transition-colors">
+                <td class="p-3.5 flex items-center gap-3">
+                  <img src="{{ b.get_logo_url }}" class="w-10 h-10 rounded-lg object-cover border border-stone-200" alt="{{ b.name }}">
+                  <div>
+                    <span class="font-bold text-stone-900 block">{{ b.name }}</span>
+                    <span class="text-[10px] text-stone-400 font-mono">/s/{{ b.slug }}/</span>
+                  </div>
+                </td>
+                <td class="p-3.5 text-stone-600">{{ b.category.name }}</td>
+                <td class="p-3.5 font-medium">{{ b.city }}</td>
+                <td class="p-3.5">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold {% if b.commerce_mode == 'both' %}bg-amber-100 text-amber-900 border border-amber-300{% elif b.commerce_mode == 'booking' %}bg-blue-100 text-blue-900 border border-blue-300{% else %}bg-emerald-100 text-emerald-900 border border-emerald-300{% endif %}">
+                    {% if b.commerce_mode == 'both' %}Booking & Cart{% elif b.commerce_mode == 'booking' %}Booking Only{% else %}Cart Only{% endif %}
+                  </span>
+                </td>
+                <td class="p-3.5">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-stone-100 text-stone-700">{{ b.tier }}</span>
+                </td>
+                <td class="p-3.5 font-bold text-amber-900">★ {{ b.rating }}</td>
+                <td class="p-3.5">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Active</span>
+                </td>
+                <td class="p-3.5 text-right space-x-2">
+                  <a href="{% url 'mall:mini_site' slug=b.slug %}" target="_blank" class="text-stone-500 hover:text-stone-900 font-semibold">Storefront</a>
+                  <a href="{% url 'mall:merchant_dashboard' slug=b.slug %}" class="text-amber-700 hover:text-amber-800 font-bold">Portal &rarr;</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="8" class="p-12 text-center text-stone-500 text-xs">
+                  No stores registered. Click "Seed Malawi Data" or "Add New Merchant" above.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Add Merchant Backend Modal -->
+<div id="addMerchantModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-stone-900/60 backdrop-blur-xs p-4">
+  <div class="bg-white rounded-2xl max-w-xl w-full p-6 text-left space-y-4 shadow-2xl border border-stone-200">
+    <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+      <h3 class="font-serif font-bold text-lg text-stone-900">Provision New Merchant</h3>
+      <button onclick="document.getElementById('addMerchantModal').classList.add('hidden')" class="text-stone-400 hover:text-stone-800 p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+
+    <div class="space-y-3 text-xs">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-stone-700 font-medium mb-1">Business Name *</label>
+          <input type="text" id="mName" placeholder="e.g. Mzuzu Coffee Bar" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-stone-700 font-medium mb-1">URL Slug *</label>
+          <input type="text" id="mSlug" placeholder="e.g. mzuzu-coffee-bar" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-stone-700 font-medium mb-1">Department / Category</label>
+          <select id="mCategory" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none cursor-pointer">
+            {% for cat in categories %}
+              <option value="{{ cat.slug }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-stone-700 font-medium mb-1">City Location</label>
+          <select id="mCity" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none cursor-pointer">
+            <option value="Blantyre">Blantyre</option>
+            <option value="Lilongwe">Lilongwe</option>
+            <option value="Mzuzu">Mzuzu</option>
+            <option value="Zomba">Zomba</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-stone-700 font-medium mb-1">Tagline</label>
+        <input type="text" id="mTagline" placeholder="Authentic Malawian craftsmanship & retail..." class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none">
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-stone-700 font-medium mb-1">Phone Number</label>
+          <input type="text" id="mPhone" placeholder="+265 888 000 111" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-stone-700 font-medium mb-1">Subscription Tier</label>
+          <select id="mTier" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none cursor-pointer">
+            <option value="business">Business Store</option>
+            <option value="premium">Premium Brand</option>
+            <option value="free">Free Basic</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Business Capability: Booking, Cart, or Both -->
+      <div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3">
+        <label class="block text-stone-900 font-bold mb-1">Store Commerce Capability *</label>
+        <p class="text-[11px] text-stone-600 mb-2">Choose whether this business offers online appointments/booking, retail cart checkout, or both features.</p>
+        <select id="mCommerceMode" class="w-full bg-white border border-stone-200 rounded-lg p-2 font-medium text-stone-800 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none cursor-pointer">
+          <option value="both" selected>Both Booking & Cart (Full Hybrid Storefront)</option>
+          <option value="cart">Cart Only (Physical Retail / Merchandise)</option>
+          <option value="booking">Booking Only (Services / Salons / Consultants)</option>
+        </select>
+      </div>
+
+      <!-- Local File Uploads (Internal Device Storage Only) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+        <div class="border border-dashed border-stone-300 rounded-xl p-3 bg-stone-50 text-center">
+          <label class="block text-stone-800 font-semibold mb-1">Brand Logo (Internal Storage)</label>
+          <p class="text-[10px] text-stone-500 mb-2">Select an image file from your device</p>
+          <input type="file" id="mLogoFile" accept="image/*" class="w-full text-xs text-stone-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-stone-900 file:text-white hover:file:bg-stone-800 cursor-pointer">
+        </div>
+        <div class="border border-dashed border-stone-300 rounded-xl p-3 bg-stone-50 text-center">
+          <label class="block text-stone-800 font-semibold mb-1">Cover Photo (Internal Storage)</label>
+          <p class="text-[10px] text-stone-500 mb-2">Select a banner from your device</p>
+          <input type="file" id="mCoverFile" accept="image/*" class="w-full text-xs text-stone-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-700 cursor-pointer">
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-stone-100 flex items-center justify-end gap-3">
+        <button onclick="document.getElementById('addMerchantModal').classList.add('hidden')" class="px-4 py-2 border border-stone-200 rounded-xl text-stone-600 font-semibold">
+          Cancel
+        </button>
+        <button onclick="createMerchant()" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold shadow-xs">
+          Provision Store
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function seedDatabase() {
+    if (!confirm('This will seed Malawian categories and flagship boutiques into the database. Proceed?')) return;
+    try {
+      const resp = await fetch('/api/seed/', { method: 'POST' });
+      const res = await resp.json();
+      if (res.success) {
+        alert('SuperMall database seeded successfully!');
+        window.location.reload();
+      } else {
+        alert('Error: ' + (res.error || 'Failed'));
+      }
+    } catch (e) {
+      alert('Network error: ' + e.message);
+    }
+  }
+
+  async function createMerchant() {
+    const name = document.getElementById('mName').value.trim();
+    const slug = document.getElementById('mSlug').value.trim();
+    const categorySlug = document.getElementById('mCategory').value;
+    const city = document.getElementById('mCity').value;
+    const tagline = document.getElementById('mTagline').value.trim();
+    const phone = document.getElementById('mPhone').value.trim();
+    const tier = document.getElementById('mTier').value;
+    const commerce_mode = document.getElementById('mCommerceMode').value;
+    const logoFileInput = document.getElementById('mLogoFile');
+    const coverFileInput = document.getElementById('mCoverFile');
+
+    if (!name || !slug) {
+      alert('Please provide store name and slug.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('slug', slug);
+    formData.append('categorySlug', categorySlug);
+    formData.append('city', city);
+    formData.append('tagline', tagline);
+    formData.append('phone', phone);
+    formData.append('tier', tier);
+    formData.append('commerce_mode', commerce_mode);
+
+    if (logoFileInput.files && logoFileInput.files[0]) {
+      formData.append('logo_file', logoFileInput.files[0]);
+    }
+    if (coverFileInput.files && coverFileInput.files[0]) {
+      formData.append('cover_file', coverFileInput.files[0]);
+    }
+
+    try {
+      const resp = await fetch('/api/merchants/create/', {
+        method: 'POST',
+        body: formData
+      });
+      const res = await resp.json();
+      if (res.success) {
+        alert(`Merchant "${name}" created successfully with ${commerce_mode} capability!`);
+        window.location.reload();
+      } else {
+        alert('Error creating merchant: ' + (res.error || 'Failed'));
+      }
+    } catch (e) {
+      alert('Network error: ' + e.message);
+    }
+  }
+</script>
+{% endblock %}

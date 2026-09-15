@@ -1,0 +1,184 @@
+{% extends 'mall/base.html' %}
+{% load static %}
+
+{% block title %}Order Fulfillment - {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-stone-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    
+    <!-- Merchant Header Bar -->
+    <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <img src="{{ business.logo }}" alt="{{ business.name }}" class="w-14 h-14 rounded-xl object-cover border border-stone-200">
+        <div>
+          <h1 class="font-serif font-bold text-2xl text-stone-900">{{ business.name }}</h1>
+          <p class="text-xs text-stone-500 mt-0.5">Order Fulfillment & Bag Dispatch Center</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex items-center gap-3 border-b border-stone-200 pb-2 text-xs font-semibold">
+      <a href="{% url 'mall:merchant_dashboard' slug=business.slug %}" class="px-4 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:bg-stone-50">
+        Overview
+      </a>
+      <a href="{% url 'mall:merchant_inventory' slug=business.slug %}" class="px-4 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:bg-stone-50">
+        Inventory & Catalogue
+      </a>
+      <a href="{% url 'mall:merchant_orders' slug=business.slug %}" class="px-4 py-2 rounded-xl bg-stone-900 text-white shadow-xs">
+        Customer Orders ({{ orders.count }})
+      </a>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="flex items-center gap-2 overflow-x-auto text-xs pb-1">
+      <a href="?status=all" class="px-3.5 py-1.5 rounded-lg font-semibold {% if status_filter == 'all' %}bg-stone-900 text-white{% else %}bg-white text-stone-600 border border-stone-200{% endif %}">
+        All Orders
+      </a>
+      <a href="?status=pending" class="px-3.5 py-1.5 rounded-lg font-semibold {% if status_filter == 'pending' %}bg-stone-900 text-white{% else %}bg-white text-stone-600 border border-stone-200{% endif %}">
+        Pending Action
+      </a>
+      <a href="?status=confirmed" class="px-3.5 py-1.5 rounded-lg font-semibold {% if status_filter == 'confirmed' %}bg-stone-900 text-white{% else %}bg-white text-stone-600 border border-stone-200{% endif %}">
+        Confirmed
+      </a>
+      <a href="?status=dispatched" class="px-3.5 py-1.5 rounded-lg font-semibold {% if status_filter == 'dispatched' %}bg-stone-900 text-white{% else %}bg-white text-stone-600 border border-stone-200{% endif %}">
+        Dispatched
+      </a>
+      <a href="?status=completed" class="px-3.5 py-1.5 rounded-lg font-semibold {% if status_filter == 'completed' %}bg-stone-900 text-white{% else %}bg-white text-stone-600 border border-stone-200{% endif %}">
+        Completed
+      </a>
+    </div>
+
+    <!-- Orders Feed -->
+    <div class="space-y-4">
+      {% for ord in orders %}
+        <div class="bg-white rounded-2xl border border-stone-200 shadow-xs p-5 space-y-4 text-xs">
+          
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 pb-3">
+            <div class="flex items-center gap-3">
+              <span class="font-mono font-bold text-stone-900 bg-stone-100 px-2.5 py-1 rounded text-xs">
+                #{{ ord.order_ref }}
+              </span>
+              <span class="text-stone-400">•</span>
+              <span class="text-stone-500">{{ ord.created_at|date:"M d, Y H:i" }}</span>
+              <span class="text-stone-400">•</span>
+              <span class="capitalize font-semibold text-stone-700">
+                {% if ord.delivery_option == 'delivery' %}🚚 Local Delivery{% else %}🏬 Store Pickup{% endif %}
+              </span>
+            </div>
+
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider {% if ord.status == 'pending' %}bg-amber-100 text-amber-800{% elif ord.status == 'confirmed' %}bg-blue-100 text-blue-800{% elif ord.status == 'dispatched' %}bg-purple-100 text-purple-800{% elif ord.status == 'completed' %}bg-emerald-100 text-emerald-800{% else %}bg-rose-100 text-rose-800{% endif %}">
+              {{ ord.status }}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-stone-50 p-4 rounded-xl">
+            <div>
+              <span class="text-[10px] text-stone-400 uppercase font-semibold block">Buyer Contact</span>
+              <p class="font-bold text-stone-900 mt-0.5">{{ ord.customer_name }}</p>
+              <p class="text-stone-500 font-mono text-[11px]">{{ ord.customer_phone }}</p>
+              <a href="https://wa.me/{{ ord.customer_phone|cut:' '|cut:'+' }}" target="_blank" class="inline-flex items-center gap-1 text-emerald-600 font-semibold text-[11px] mt-1.5 hover:underline">
+                <span>Message via WhatsApp &rarr;</span>
+              </a>
+            </div>
+
+            <div>
+              <span class="text-[10px] text-stone-400 uppercase font-semibold block">Fulfillment Details</span>
+              <p class="text-stone-800 mt-0.5">{{ ord.delivery_address|default:"Pickup at Store Counter" }}</p>
+              {% if ord.notes %}
+                <p class="text-amber-800 text-[11px] mt-1 italic">Note: "{{ ord.notes }}"</p>
+              {% endif %}
+            </div>
+
+            <div>
+              <span class="text-[10px] text-stone-400 uppercase font-semibold block">Payment & Total</span>
+              <p class="font-bold text-stone-900 mt-0.5 capitalize">{{ ord.payment_method|cut:'_' }}</p>
+              <div class="text-base font-bold font-serif text-amber-900 mt-0.5">MWK {{ ord.total }}</div>
+            </div>
+          </div>
+
+          <!-- Items Table -->
+          <div class="border border-stone-200 rounded-xl overflow-hidden">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-stone-50 text-stone-500 font-semibold">
+                <tr>
+                  <th class="p-2.5">Item</th>
+                  <th class="p-2.5">Size</th>
+                  <th class="p-2.5">Unit Price</th>
+                  <th class="p-2.5">Qty</th>
+                  <th class="p-2.5 text-right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-100">
+                {% for itm in ord.items.all %}
+                  <tr>
+                    <td class="p-2.5 font-medium text-stone-900">{{ itm.product_name }}</td>
+                    <td class="p-2.5 text-stone-500">{{ itm.selected_size|default:"-" }}</td>
+                    <td class="p-2.5 font-serif text-stone-700">MWK {{ itm.price }}</td>
+                    <td class="p-2.5 font-bold">{{ itm.quantity }}</td>
+                    <td class="p-2.5 text-right font-serif font-bold text-stone-900">MWK {{ itm.price }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+            {% if ord.status == 'pending' %}
+              <button onclick="updateOrderStatus('{{ ord.id }}', 'confirmed')" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-xs shadow-xs">
+                Confirm Order
+              </button>
+            {% endif %}
+
+            {% if ord.status == 'confirmed' or ord.status == 'pending' %}
+              <button onclick="updateOrderStatus('{{ ord.id }}', 'dispatched')" class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold text-xs shadow-xs">
+                Dispatch Courier
+              </button>
+            {% endif %}
+
+            {% if ord.status == 'dispatched' %}
+              <button onclick="updateOrderStatus('{{ ord.id }}', 'completed')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow-xs">
+                Mark Delivered / Completed
+              </button>
+            {% endif %}
+
+            {% if ord.status != 'cancelled' and ord.status != 'completed' %}
+              <button onclick="updateOrderStatus('{{ ord.id }}', 'cancelled')" class="px-3 py-1.5 text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg font-medium text-xs">
+                Cancel
+              </button>
+            {% endif %}
+          </div>
+
+        </div>
+      {% empty %}
+        <div class="bg-white rounded-2xl border border-stone-200 p-12 text-center text-stone-500 text-xs">
+          No customer orders matching this status filter.
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<script>
+  async function updateOrderStatus(orderId, newStatus) {
+    try {
+      const resp = await fetch('/api/orders/update-status/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, status: newStatus })
+      });
+      const res = await resp.json();
+      if (res.success) {
+        window.location.reload();
+      } else {
+        alert('Update error: ' + (res.error || 'Failed'));
+      }
+    } catch (e) {
+      alert('Network error updating status: ' + e.message);
+    }
+  }
+</script>
+{% endblock %}
