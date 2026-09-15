@@ -71,6 +71,7 @@ import { HelpCenterPage } from './components/HelpCenterPage.tsx';
 import { FAQsPage } from './components/FAQsPage.tsx';
 import { ShippingReturnsPage } from './components/ShippingReturnsPage.tsx';
 import { ReportIssuePage } from './components/ReportIssuePage.tsx';
+import { ContentEditor } from './components/ContentEditor.tsx';
 
 const SuperMallAppContent: React.FC = () => {
   const { currentBusinessId, setCurrentBusinessId, setCurrentRole } = useAuth();
