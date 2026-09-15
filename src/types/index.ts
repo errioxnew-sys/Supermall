@@ -226,4 +226,5 @@ export type ActiveView =
   | { type: 'faqs' }
   | { type: 'shipping_returns' }
   | { type: 'report_issue' }
+  | { type: 'content_admin'; section?: 'about' | 'faqs' | 'help' | 'shipping' | 'issues' }
   | { type: 'register_business' };
